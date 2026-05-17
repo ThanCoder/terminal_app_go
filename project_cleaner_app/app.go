@@ -25,7 +25,7 @@ func RunApp() {
 	fmt.Printf("🔍 Scanning projects in: %s\n\n", scanPath)
 
 	projects := scanProjects(scanPath)
-	fmt.Printf("projects: %v\n", projects)
+	// fmt.Printf("projects: %v\n", projects)
 
 	if len(projects) == 0 {
 		fmt.Println("✨ No cache folders found. Everything is clean!")
@@ -171,6 +171,14 @@ func scanProjects(root string) []ProjectInfo {
 		} else if existsPath(filepath.Join(path, "Cargo.toml")) {
 			p = ProjectInfo{Type: "Rust", Path: path}
 			p.Items = append(p.Items, filepath.Join(path, "target"))
+			isProject = true
+		} else
+		// ၄။ Python Project စစ်ဆေးခြင်း (requirements.txt သို့မဟုတ် main.py ရှိရင် Python လို့ ယူဆမယ်)
+		if existsPath(filepath.Join(path, "requirements.txt")) || existsPath(filepath.Join(path, "main.py")) {
+			p = ProjectInfo{Type: "Python", Path: path}
+			// Python အတွက်က root အောက်တင်မကဘဲ sub-folders တွေထဲမှာပါ __pycache__ ရှိနိုင်လို့
+			// လက်ရှိ root အဆင့်မှာ ရှိတာကိုပဲ အရင်ထည့်ထားမယ်
+			p.Items = append(p.Items, filepath.Join(path, "__pycache__"), filepath.Join(path, "build"), filepath.Join(path, "dist"))
 			isProject = true
 		}
 
